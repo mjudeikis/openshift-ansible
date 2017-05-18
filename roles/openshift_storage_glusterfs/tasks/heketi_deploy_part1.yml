@@ -29,6 +29,7 @@
       HEKETI_EXECUTOR: "{{ glusterfs_heketi_executor }}"
       HEKETI_FSTAB: "{{ glusterfs_heketi_fstab }}"
       CLUSTER_NAME: "{{ glusterfs_name }}"
+      HEKETI_KUBE_NAMESPACE: "{{ glusterfs_namespace }}"
 
 - name: Set heketi Deployed fact
   set_fact:
