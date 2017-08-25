@@ -78,11 +78,15 @@ objects:
             value: '14'
           - name: HEKETI_KUBE_GLUSTER_DAEMONSET
             value: '1'
+          - name: HEKETI_KUBE_NAMESPACE
+            value: ${HEKETI_KUBE_NAMESPACE}
           ports:
           - containerPort: 8080
           volumeMounts:
           - name: db
             mountPath: /var/lib/heketi
+          - name: topology
+            mountPath: ${TOPOLOGY_PATH}
           - name: config
             mountPath: /etc/heketi
           readinessProbe:
@@ -99,6 +103,9 @@ objects:
               port: 8080
         volumes:
         - name: db
+        - name: topology
+          secret:
+            secretName: heketi-${CLUSTER_NAME}-topology-secret
         - name: config
           secret:
             secretName: heketi-${CLUSTER_NAME}-config-secret
@@ -117,6 +124,10 @@ parameters:
   displayName: heketi fstab path
   description: Set the fstab path, file that is populated with bricks that heketi creates
   value: /var/lib/heketi/fstab
+- name: HEKETI_KUBE_NAMESPACE
+  displayName: Namespace
+  description: Set the namespace where the GlusterFS pods reside
+  value: default
 - name: HEKETI_ROUTE
   displayName: heketi route name
   description: Set the hostname for the route URL
@@ -131,3 +142,6 @@ parameters:
   displayName: GlusterFS cluster name
   description: A unique name to identify this heketi service, useful for running multiple heketi instances
   value: glusterfs
+- name: TOPOLOGY_PATH
+  displayName: heketi topology file location
+  required: True
