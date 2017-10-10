@@ -33,13 +33,21 @@ variables also control configuration behavior:
 
 | Name                                         | Default value | Description                                                                  |
 |----------------------------------------------|---------------|------------------------------------------------------------------------------|
-| openshift_hosted_registry_glusterfs_swap     | False         | Whether to swap an existing registry's storage volume for a GlusterFS volume |
-| openshift_hosted_registry_glusterfs_swapcopy | True          | If swapping, also copy the current contents of the registry volume           |
+| openshift_hosted_registry_storage_glusterfs_swap     | False         | Whether to swap an existing registry's storage volume for a GlusterFS volume |
+| openshift_hosted_registry_storage_glusterfs_swapcopy | True          | If swapping, also copy the current contents of the registry volume           |
+| openshift_hosted_registry_storage_glusterfs_ips      | []            | If we use external gluster for Registry backend we need to provide list of IP's for EP creation|
+| openshift_hosted_registry_storage_glusterfs_path     | []            | If we use external gluster we need to provide volume path from gluster cluster for mounting|
+| openshift_hosted_registry_storage_glusterfs_endpoints| glusterfs-registry-endpoints             | Default value how SVC and EP for gluster will be named |
+
+**Note:** if you have host group `glusterfs` or `glusterfs_registry` set in your invetory, variable `openshift_hosted_registry_storage_glusterfs_ips`, CAN'T be used because this is 2 different use-cases - CNS/CRS vs External Native Gluster. 
+_
 
 Dependencies
 ------------
 
 * openshift_hosted_facts
+* openshift_storage_glusterfs
+* openshift_persistent_volumes
 
 Example Playbook
 ----------------
@@ -55,6 +63,11 @@ Example Playbook
       cafile: /path/to/my-router-ca.crt
     openshift_hosted_router_registryurl: 'registry.access.redhat.com/openshift3/ose-haproxy-router:v3.0.2.0'
     openshift_hosted_router_selector: 'type=infra'
+    openshift_hosted_registry_storage_kind=glusterfs
+    openshift_hosted_registry_storage_glusterfs_path=external_registry_path
+    openshift_hosted_registry_storage_glusterfs_endpoints=external-gluster-ep-name
+    openshift_hosted_registry_storage_glusterfs_ips=192.168.20.239,192.168.20.96,192.168.20.114
+
 ```
 
 License

@@ -66,3 +66,5 @@ r_openshift_storage_glusterfs_os_firewall_allow:
   port: "24008/tcp"
 - service: glusterfs_bricks
   port: "49152-49251/tcp"
+
+openshift_hosted_registry_external_gluster: False

@@ -40,3 +40,15 @@
       openshift_master_dynamic_provisioning_enabled to True and set an
       openshift_cloudprovider_kind. You can disable this check with
       'dynamic_volumes_check=False'.
+
+- name: Ensure that gluster CNS/CRS/External Gluster are configured right
+  when:
+  - openshift_hosted_registry_storage_kind | default(none) in ['glusterfs']
+  - openshift_hosted_registry_storage_glusterfs_path is defined and openshift_hosted_registry_storage_glusterfs_path != ''
+  - openshift_hosted_registry_storage_glusterfs_ips is defined and openshift_hosted_registry_storage_glusterfs_ips != ''
+  - "'glusterfs' in groups | default([]) or 'glusterfs_registry' in groups | default([])"
+  fail:
+    msg: |-
+      Using a registry storage kind of 'glusterfs' with variable openshift_hosted_registry_storage_glusterfs_ips and host groups glusterfs/glusterfs_registry is not possible.
+      If glusterfs/glusterfs_registry groups are set in the invetory file, registry backend is configured automaticaly (CNS and CRS). On the other side openshift_hosted_registry_storage_glusterfs_ips implies
+      that you are configuring external preconfigured gluster for registry storage backend.

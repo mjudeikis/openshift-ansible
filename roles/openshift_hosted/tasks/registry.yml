@@ -1,4 +1,10 @@
 ---
+- name: Create temp directory for doing work in
+  command: mktemp -d /tmp/openshift-hosted-ansible-XXXXXX
+  register: mktempHosted
+  changed_when: False
+  check_mode: no
+
 - name: setup firewall
   include: firewall.yml
   vars:
@@ -43,6 +49,17 @@
     openshift_hosted_registry_namespace: "{{ openshift.hosted.registry.namespace | default('default') }}"
     openshift_hosted_registry_selector: "{{ openshift.hosted.registry.selector }}"
     openshift_hosted_registry_images: "{{ openshift.hosted.registry.registryurl | default('openshift3/ose-${component}:${version}')}}"
+    openshift_hosted_registry_storage_glusterfs_path: "{{ openshift_hosted_registry_storage_glusterfs_path | default('') }}"
+    openshift_hosted_registry_storage_glusterfs_ips: "{{ openshift_hosted_registry_storage_glusterfs_ips | default('') }}"
+
+- name: Check if we use external gluster as backend
+  set_fact:
+    openshift_hosted_registry_external_gluster: True
+  when:
+  - openshift.hosted.registry.storage.kind | default(none) in ['glusterfs']
+  - openshift_hosted_registry_storage_glusterfs_path != ''
+  - openshift_hosted_registry_storage_glusterfs_ips != ''
+  - not 'glusterfs' in groups | default([])
 
 - name: Update registry environment variables when pushing via dns
   set_fact:
@@ -112,6 +129,9 @@
   when:
   - openshift.hosted.registry.storage.kind | default(none) in ['nfs', 'openstack', 'glusterfs']
 
+- include: storage/glusterfs_external.yml
+  when: openshift_hosted_registry_external_gluster is defined and openshift_hosted_registry_external_gluster
+
 - name: Create OpenShift registry
   oc_adm_registry:
     name: "{{ openshift_hosted_registry_name }}"
@@ -140,3 +160,10 @@
 - include: storage/glusterfs.yml
   when:
   - openshift.hosted.registry.storage.kind | default(none) == 'glusterfs' or openshift.hosted.registry.storage.glusterfs.swap
+
+- name: Delete temp directory
+  file:
+    name: "{{ mktempHosted.stdout }}"
+    state: absent
+  changed_when: False
+  check_mode: no

@@ -70,7 +70,8 @@ r_openshift_hosted_registry_use_firewalld: "{{ os_firewall_use_firewalld | defau
 openshift_hosted_registry_name: docker-registry
 openshift_hosted_registry_wait: "{{ not (openshift_master_bootstrap_enabled | default(False)) }}"
 openshift_hosted_registry_cert_expire_days: 730
-
+openshift_hosted_registry_external_gluster: False
+openshift_hosted_registry_storage_glusterfs_endpoints: 'glusterfs-registry-endpoints'
 r_openshift_hosted_registry_os_firewall_deny: []
 r_openshift_hosted_registry_os_firewall_allow:
 - service: Docker Registry Port
