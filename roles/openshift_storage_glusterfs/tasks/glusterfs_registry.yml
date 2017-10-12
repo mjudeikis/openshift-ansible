@@ -27,29 +27,12 @@
     glusterfs_heketi_ssh_user: "{{ openshift_storage_glusterfs_registry_heketi_ssh_user }}"
     glusterfs_heketi_ssh_sudo: "{{ openshift_storage_glusterfs_registry_heketi_ssh_sudo | bool }}"
     glusterfs_heketi_ssh_keyfile: "{{ openshift_storage_glusterfs_registry_heketi_ssh_keyfile }}"
-    glusterfs_nodes: "{% if groups.glusterfs_registry is defined %}{% set nodes = groups.glusterfs_registry %}{% elif 'groups.glusterfs' is defined %}{% set nodes = groups.glusterfs %}{% else %}{% set nodes = '[]' %}{% endif %}{{ nodes }}"
+    glusterfs_nodes: "{% if groups.glusterfs_registry is defined %}{{ groups.glusterfs_registry }}{% elif 'groups.glusterfs' is defined %}{{ groups.glusterfs }}{% else %}{{ '[]' }}{% endif %}"
 
 - include: glusterfs_common.yml
   when:
   - glusterfs_nodes | default([]) | count > 0
   - "'glusterfs' not in groups or glusterfs_nodes != groups.glusterfs"
-
-- name: Generate GlusterFS registry endpoints
-  template:
-    src: "{{ openshift.common.examples_content_version }}/glusterfs-registry-endpoints.yml.j2"
-    dest: "{{ mktemp.stdout }}/glusterfs-registry-endpoints.yml"
-
-- name: Copy GlusterFS registry service
-  template:
-    src: "{{ openshift.common.examples_content_version }}/glusterfs-registry-service.yml.j2"
-    dest: "{{ mktemp.stdout }}/glusterfs-registry-service.yml"
-
-- name: Create GlusterFS registry service
-  command: |
-       {{ openshift.common.client_binary }} apply -f {{ item }} -n {{ openshift.hosted.registry.namespace | default('default') }}
-  with_items:
-  - "{{ mktemp.stdout }}/glusterfs-registry-service.yml"
-  - "{{ mktemp.stdout }}/glusterfs-registry-endpoints.yml"
 
 - name: Check if GlusterFS registry volume exists
   command: "{{ glusterfs_heketi_client }} volume list"

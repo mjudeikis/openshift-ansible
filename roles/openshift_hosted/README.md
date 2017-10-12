@@ -33,20 +33,33 @@ variables also control configuration behavior:
 
 | Name                                         | Default value | Description                                                                  |
 |----------------------------------------------|---------------|------------------------------------------------------------------------------|
-| openshift_hosted_registry_storage_glusterfs_swap     | False         | Whether to swap an existing registry's storage volume for a GlusterFS volume |
-| openshift_hosted_registry_storage_glusterfs_swapcopy | True          | If swapping, also copy the current contents of the registry volume           |
-| openshift_hosted_registry_storage_glusterfs_ips      | []            | If we use external gluster for Registry backend we need to provide list of IP's for EP creation|
-| openshift_hosted_registry_storage_glusterfs_path     | []            | If we use external gluster we need to provide volume path from gluster cluster for mounting|
-| openshift_hosted_registry_storage_glusterfs_endpoints| glusterfs-registry-endpoints             | Default value how SVC and EP for gluster will be named |
+| openshift_hosted_registry_storage_glusterfs_ips      | `[]`            |A list of IP addresses for the GlusterFS cluster to use for hosted registry storage|
+| openshift_hosted_registry_storage_glusterfs_path     | `[]`            |If we use external gluster we need to provide volume name from gluster cluster for mounting|
 
-**Note:** if you have host group `glusterfs` or `glusterfs_registry` set in your invetory, variable `openshift_hosted_registry_storage_glusterfs_ips`, CAN'T be used because this is 2 different use-cases - CNS/CRS vs External Native Gluster. 
+**Note:** Configuring a value for 
+`openshift_hosted_registry_storage_glusterfs_ips` and with a `glusterfs_registry` 
+host group is not allowed. Specifying a `glusterfs_registry` host group 
+indicates that a new GlusterFS cluster should be configured, whereas 
+specifying `openshift_hosted_registry_storage_glusterfs_ips` indicates wanting 
+to use a pre-configured GlusterFS cluster for the registry storage.
+
+Additionally, this role's behavior responds to the following [openshift_storage_glusterfs role](../openshift_storage_glusterfs/README.md).
+variables:
+
+| Name                                          | Default value                | Description                             |
+|-----------------------------------------------|------------------------------|-----------------------------------------|
+| openshift_hosted_registry_glusterfs_endpoints | glusterfs-registry-endpoints | The name for the Endpoints resource that will point the registry to the GlusterFS nodes
+| openshift_hosted_registry_glusterfs_readonly  | False                        | Whether the GlusterFS volume should be read-only
+| openshift_hosted_registry_glusterfs_swap      | False                        | Whether to swap an existing registry's storage volume for a GlusterFS volume
+| openshift_hosted_registry_glusterfs_swapcopy  | True                         | If swapping, copy the contents of the pre-existing registry storage to the new GlusterFS volume
+
+
 _
 
 Dependencies
 ------------
 
 * openshift_hosted_facts
-* openshift_storage_glusterfs
 * openshift_persistent_volumes
 
 Example Playbook
@@ -64,9 +77,8 @@ Example Playbook
     openshift_hosted_router_registryurl: 'registry.access.redhat.com/openshift3/ose-haproxy-router:v3.0.2.0'
     openshift_hosted_router_selector: 'type=infra'
     openshift_hosted_registry_storage_kind=glusterfs
-    openshift_hosted_registry_storage_glusterfs_path=external_registry_path
-    openshift_hosted_registry_storage_glusterfs_endpoints=external-gluster-ep-name
-    openshift_hosted_registry_storage_glusterfs_ips=192.168.20.239,192.168.20.96,192.168.20.114
+    openshift_hosted_registry_storage_glusterfs_path=external_glusterfs_volume_name
+    openshift_hosted_registry_storage_glusterfs_ips=['192.168.20.239','192.168.20.96','192.168.20.114']
 
 ```
 

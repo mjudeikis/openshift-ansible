@@ -42,24 +42,13 @@
       l_default_replicas: "{{ l_node_count if openshift.hosted.registry.storage.kind | default(none) is not none else 1 }}"
     when: l_node_count | int > 0
 
-
 - name: set openshift_hosted facts
   set_fact:
     openshift_hosted_registry_replicas: "{{ openshift.hosted.registry.replicas | default(l_default_replicas) }}"
     openshift_hosted_registry_namespace: "{{ openshift.hosted.registry.namespace | default('default') }}"
     openshift_hosted_registry_selector: "{{ openshift.hosted.registry.selector }}"
     openshift_hosted_registry_images: "{{ openshift.hosted.registry.registryurl | default('openshift3/ose-${component}:${version}')}}"
-    openshift_hosted_registry_storage_glusterfs_path: "{{ openshift_hosted_registry_storage_glusterfs_path | default('') }}"
-    openshift_hosted_registry_storage_glusterfs_ips: "{{ openshift_hosted_registry_storage_glusterfs_ips | default('') }}"
-
-- name: Check if we use external gluster as backend
-  set_fact:
-    openshift_hosted_registry_external_gluster: True
-  when:
-  - openshift.hosted.registry.storage.kind | default(none) in ['glusterfs']
-  - openshift_hosted_registry_storage_glusterfs_path != ''
-  - openshift_hosted_registry_storage_glusterfs_ips != ''
-  - not 'glusterfs' in groups | default([])
+    openshift_hosted_registry_storage_glusterfs_ips: "{%- set gluster_ips = [] %}{% if groups.glusterfs_registry is defined %}{% for node in groups.glusterfs_registry %}{%- set _ = gluster_ips.append(hostvars[node].glusterfs_ip | default(hostvars[node].openshift.common.ip)) %}{% endfor %}{{ gluster_ips }}{% elif groups.glusterfs is defined %}{% for node in groups.glusterfs %}{%- set _ = gluster_ips.append(hostvars[node].glusterfs_ip | default(hostvars[node].openshift.common.ip)) %}{% endfor %}{{ gluster_ips }}{% else %}{{ openshift.hosted.registry.storage.glusterfs.ips }}{% endif %}"
 
 - name: Update registry environment variables when pushing via dns
   set_fact:
@@ -129,8 +118,10 @@
   when:
   - openshift.hosted.registry.storage.kind | default(none) in ['nfs', 'openstack', 'glusterfs']
 
-- include: storage/glusterfs_external.yml
-  when: openshift_hosted_registry_external_gluster is defined and openshift_hosted_registry_external_gluster
+- include: storage/glusterfs_endpoints.yml
+  when:
+  - openshift.hosted.registry.storage.glusterfs.ips|length > 0
+  - openshift.hosted.registry.storage.kind | default(none) in ['glusterfs']
 
 - name: Create OpenShift registry
   oc_adm_registry:
