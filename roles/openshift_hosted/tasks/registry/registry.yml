@@ -183,3 +183,10 @@
 - include: storage/glusterfs.yml
   when:
   - openshift.hosted.registry.storage.kind | default(none) == 'glusterfs' or openshift.hosted.registry.storage.glusterfs.swap
+
+- name: Delete temp directory
+  file:
+   name: "{{ mktempHosted.stdout }}"
+   state: absent
+   changed_when: False
+   check_mode: no
