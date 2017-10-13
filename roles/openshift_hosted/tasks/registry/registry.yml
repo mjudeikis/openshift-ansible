@@ -1,10 +1,10 @@
 ---
 
- - name: Create temp directory for doing work in
-   command: mktemp -d /tmp/openshift-hosted-ansible-XXXXXX
-   register: mktempHosted
-   changed_when: False
-   check_mode: no
+- name: Create temp directory for doing work in
+  command: mktemp -d /tmp/openshift-hosted-ansible-XXXXXX
+  register: mktempHosted
+  changed_when: False
+  check_mode: no
 
 - block:
 
