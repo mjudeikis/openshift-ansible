@@ -26,7 +26,7 @@ openshift_hosted_routers:
   - 443:443
   certificate: "{{ openshift_hosted_router_certificate | default({}) }}"
 
-
+openshift_hosted_registry_storage_glusterfs_ips: ""
 openshift_hosted_router_certificate: {}
 openshift_hosted_registry_cert_expire_days: 730
 openshift_hosted_router_create_certificate: True

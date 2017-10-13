@@ -27,6 +27,6 @@
     glusterfs_heketi_ssh_user: "{{ openshift_storage_glusterfs_heketi_ssh_user }}"
     glusterfs_heketi_ssh_sudo: "{{ openshift_storage_glusterfs_heketi_ssh_sudo | bool }}"
     glusterfs_heketi_ssh_keyfile: "{{ openshift_storage_glusterfs_heketi_ssh_keyfile }}"
-    glusterfs_nodes: "{{ groups.glusterfs }}"
+    glusterfs_nodes: "{{ groups.glusterfs | default(0) }}"
 
 - include: glusterfs_common.yml

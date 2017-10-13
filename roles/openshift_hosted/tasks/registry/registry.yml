@@ -1,4 +1,11 @@
 ---
+
+ - name: Create temp directory for doing work in
+   command: mktemp -d /tmp/openshift-hosted-ansible-XXXXXX
+   register: mktempHosted
+   changed_when: False
+   check_mode: no
+
 - block:
 
   - name: Retrieve list of openshift nodes matching registry selector
@@ -43,6 +50,7 @@
     openshift_hosted_registry_routecertificates: "{{ ('routecertificates' in openshift.hosted.registry.keys()) | ternary(openshift.hosted.registry.routecertificates, {}) }}"
     openshift_hosted_registry_routehost: "{{ ('routehost' in openshift.hosted.registry.keys()) | ternary(openshift.hosted.registry.routehost, False) }}"
     openshift_hosted_registry_routetermination: "{{ ('routetermination' in openshift.hosted.registry.keys()) | ternary(openshift.hosted.registry.routetermination, 'passthrough') }}"
+    openshift_hosted_registry_storage_glusterfs_ips: "{% set comma = joiner(',') %}{% if groups.glusterfs_registry is defined %}{% for node in groups.glusterfs_registry %}{{ comma() }}{{  hostvars[node].glusterfs_ip | default(hostvars[node].openshift.common.ip) }}{% endfor %}{% elif groups.glusterfs is defined %}{% for node in groups.glusterfs %}{{ comma() }}{{ hostvars[node].glusterfs_ip | default(hostvars[node].openshift.common.ip) }}{% endfor %}{% else %}{{ openshift_hosted_registry_storage_glusterfs_ips }}{% endif %}"
     openshift_hosted_registry_edits:
     # These edits are being specified only to prevent 'changed' on rerun
     - key: spec.strategy.rollingParams
@@ -123,6 +131,12 @@
       claim_name: "{{ openshift.hosted.registry.storage.volume.name }}-claim"
   when:
   - openshift.hosted.registry.storage.kind | default(none) in ['nfs', 'openstack', 'glusterfs']
+
+- include: storage/glusterfs_external.yml
+  when:
+  - openshift_hosted_registry_storage_glusterfs_ips != ''
+  - openshift.hosted.registry.storage.kind | default(none) in ['glusterfs']
+
 
 - name: Create OpenShift registry
   oc_adm_registry:
