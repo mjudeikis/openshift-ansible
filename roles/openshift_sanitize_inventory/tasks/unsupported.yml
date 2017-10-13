@@ -21,11 +21,13 @@
       Configuring a value for openshift_hosted_registry_storage_glusterfs_ips and with a glusterfs_registry host group is not allowed.
       Specifying a glusterfs_registry host group indicates that a new GlusterFS cluster should be configures, whereas
       specifying openshift_hosted_registry_storage_glusterfs_ips indicates wanting to use a pre-configured GlusterFS cluster for the registry storage.
+
 - name: Ensure registry's backend is configured correctly
   when:
   - openshift_hosted_registry_storage_kind | default(none) in ['glusterfs']
   - not openshift_hosted_registry_storage_glusterfs_ips is defined
-  - "not 'glusterfs_registry' in groups | default([]) or 'gluster' in groups | default([])"
+  - "not 'glusterfs_registry' in groups | default([])"
+  - "not 'glusterfs' in groups | default([])"
   fail:
     msg: |-
       Configuring a value for openshift_hosted_registry_storage_kind=glusterfs without variable openshift_hosted_registry_storage_glusterfs_ips or glusterfs, glusterfs_registry groups is not allowed.
