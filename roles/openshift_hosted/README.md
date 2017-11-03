@@ -33,26 +33,19 @@ variables also control configuration behavior:
 
 | Name                                         | Default value | Description                                                                  |
 |----------------------------------------------|---------------|------------------------------------------------------------------------------|
-| openshift_hosted_registry_storage_glusterfs_ips      | `[]`            |A list of IP addresses for the GlusterFS cluster to use for hosted registry storage|
-| openshift_hosted_registry_storage_glusterfs_path     | `[]`            |If we use external gluster we need to provide volume name from gluster cluster for mounting|
+| openshift_hosted_registry_storage_glusterfs_endpoints | glusterfs-registry-endpoints | The name for the Endpoints resource that will point the registry to the GlusterFS nodes
+| openshift_hosted_registry_storage_glusterfs_path      | glusterfs-registry-volume    | The name for the GlusterFS volume that will provide registry storage
+| openshift_hosted_registry_storage_glusterfs_readonly  | False                        | Whether the GlusterFS volume should be read-only
+| openshift_hosted_registry_storage_glusterfs_swap      | False                        | Whether to swap an existing registry's storage volume for a GlusterFS volume
+| openshift_hosted_registry_storage_glusterfs_swapcopy  | True                         | If swapping, copy the contents of the pre-existing registry storage to the new GlusterFS volume
+| openshift_hosted_registry_storage_glusterfs_ips       | `[]`                         | A list of IP addresses of the nodes of the GlusterFS cluster to use for hosted registry storage
 
-**Note:** Configuring a value for 
-`openshift_hosted_registry_storage_glusterfs_ips` and with a `glusterfs_registry` 
+**NOTE:** Configuring a value for
+`openshift_hosted_registry_storage_glusterfs_ips` with a `glusterfs_registry`
 host group is not allowed. Specifying a `glusterfs_registry` host group 
 indicates that a new GlusterFS cluster should be configured, whereas 
 specifying `openshift_hosted_registry_storage_glusterfs_ips` indicates wanting 
 to use a pre-configured GlusterFS cluster for the registry storage.
-
-Additionally, this role's behavior responds to the following [openshift_storage_glusterfs role](../openshift_storage_glusterfs/README.md).
-variables:
-
-| Name                                          | Default value                | Description                             |
-|-----------------------------------------------|------------------------------|-----------------------------------------|
-| openshift_hosted_registry_glusterfs_endpoints | glusterfs-registry-endpoints | The name for the Endpoints resource that will point the registry to the GlusterFS nodes
-| openshift_hosted_registry_glusterfs_readonly  | False                        | Whether the GlusterFS volume should be read-only
-| openshift_hosted_registry_glusterfs_swap      | False                        | Whether to swap an existing registry's storage volume for a GlusterFS volume
-| openshift_hosted_registry_glusterfs_swapcopy  | True                         | If swapping, copy the contents of the pre-existing registry storage to the new GlusterFS volume
-
 
 _
 

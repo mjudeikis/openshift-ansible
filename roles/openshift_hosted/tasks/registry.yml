@@ -120,7 +120,7 @@
 
 - include: storage/glusterfs_endpoints.yml
   when:
-  - openshift.hosted.registry.storage.glusterfs.ips|length > 0
+  - openshift_hosted_registry_storage_glusterfs_ips|length > 0
   - openshift.hosted.registry.storage.kind | default(none) in ['glusterfs']
 
 - name: Create OpenShift registry
