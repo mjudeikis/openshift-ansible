@@ -161,6 +161,7 @@ registry. These variables start with the prefix
 values in their corresponding non-registry variables. The following variables
 are an exception:
 
+<<<<<<< HEAD
 | Name                                                            | Default value         | Description                             |
 |-----------------------------------------------------------------|-----------------------|-----------------------------------------|
 | openshift_storage_glusterfs_registry_namespace                  | registry namespace    | Default is to use the hosted registry's namespace, otherwise 'glusterfs'
@@ -171,6 +172,15 @@ are an exception:
 | openshift_storage_glusterfs_registry_block_storageclass_default | False                 | Sets the StorageClass for each Gluster Block cluster as default
 | openshift_storage_glusterfs_registry_heketi_admin_key           | auto-generated        | Separate from the above
 | openshift_storage_glusterfs_registry_heketi_user_key            | auto-generated        | Separate from the above
+=======
+| Name                                                  | Default value         | Description                             |
+|-------------------------------------------------------|-----------------------|-----------------------------------------|
+| openshift_storage_glusterfs_registry_namespace        | registry namespace    | Default is to use the hosted registry's namespace, otherwise 'glusterfs'
+| openshift_storage_glusterfs_registry_name             | 'registry'            | This allows for the logical separation of the registry GlusterFS cluster from other GlusterFS clusters
+| openshift_storage_glusterfs_registry_storageclass     | False                 | It is recommended to not create a StorageClass for GlusterFS clusters serving registry storage, so as to avoid performance penalties
+| openshift_storage_glusterfs_registry_heketi_admin_key | auto-generated        | Separate from the above
+| openshift_storage_glusterfs_registry_heketi_user_key  | auto-generated        | Separate from the above
+>>>>>>> e893c818a... Add support for external glusterfs as registry backend
 
 Additionally, this role's behavior responds to several registry-specific variables in the [openshift_hosted role](../openshift_hosted/README.md):
 
