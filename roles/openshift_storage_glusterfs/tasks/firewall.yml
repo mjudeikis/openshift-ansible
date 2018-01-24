@@ -10,6 +10,17 @@
     when: item.cond | default(True)
     with_items: "{{ r_openshift_storage_glusterfs_os_firewall_allow }}"
 
+  - name: Add iptables glusterblock rules
+    os_firewall_manage_iptables:
+      name: "{{ item.service }}"
+      action: add
+      protocol: "{{ item.port.split('/')[1] }}"
+      port: "{{ item.port.split('/')[0] }}"
+    when: 
+     - item.cond | default(True)
+     - glusterfs_block_deploy
+    with_items: "{{ r_openshift_storage_glusterblock_os_firewall_allow }}"
+
   - name: Remove iptables rules
     os_firewall_manage_iptables:
       name: "{{ item.service }}"
@@ -29,6 +40,17 @@
       state: enabled
     when: item.cond | default(True)
     with_items: "{{ r_openshift_storage_glusterfs_os_firewall_allow }}"
+
+  - name: Add firewalld allow rules
+    firewalld:
+      port: "{{ item.port }}"
+      permanent: true
+      immediate: true
+      state: enabled
+    when: 
+     - item.cond | default(True)
+     - glusterfs_block_deploy
+    with_items: "{{ r_openshift_storage_glusterblock_os_firewall_allow }}"
 
   - name: Remove firewalld allow rules
     firewalld:
