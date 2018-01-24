@@ -5,8 +5,15 @@
     dest: /etc/modules-load.d/glusterfs.conf
   register: km
 
+- name: Ensure iscsi and multipath modules are loaded
+  template:
+    src: glusterblock.conf
+    dest: /etc/modules-load.d/glusterblock.conf
+  register: km-block
+  when: gluster_block_deploy
+
 - name: load kernel modules
   systemd:
     name: systemd-modules-load.service
     state: restarted
-  when: km is changed
+  when: km is changed or km-block is changed
