@@ -5,7 +5,9 @@
   tasks:
 
 - name: Initialize host facts
-  hosts: oo_all_hosts
+  # l_init_fact_hosts is passed in via play during control-plane-only
+  # upgrades and scale-up plays; otherwise oo_all_hosts is used.
+  hosts: "{{ l_init_fact_hosts | default('oo_all_hosts') }}"
   tasks:
   - name: load openshift_facts module
     import_role:
@@ -13,7 +15,7 @@
 
   # TODO: Should this role be refactored into health_checks??
   - name: Run openshift_sanitize_inventory to set variables
-    include_role:
+    import_role:
       name: openshift_sanitize_inventory
 
   - name: Detecting Operating System from ostree_booted
@@ -100,3 +102,5 @@
       # We need to setup openshift_client_binary here for special uses of delegate_to in
       # later roles and plays.
       first_master_client_binary: "{{  openshift_client_binary }}"
+      #Some roles may require this to be set for first master
+      openshift_client_binary: "{{ openshift_client_binary }}"

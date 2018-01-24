@@ -107,9 +107,12 @@
     service_name: "{{ item.name }}"
     tls_termination: reencrypt
   with_items:
-    - { name: prometheus, host: "{{ openshift_prometheus_hostname }}" }
-    - { name: alerts, host: "{{ openshift_prometheus_alerts_hostname }}" }
-    - { name: alertmanager, host: "{{ openshift_prometheus_alertmanager_hostname }}" }
+    - name: prometheus
+      host: "{{ openshift_prometheus_hostname }}"
+    - name: alerts
+      host: "{{ openshift_prometheus_alerts_hostname }}"
+    - name: alertmanager
+      host: "{{ openshift_prometheus_alertmanager_hostname }}"
 
 # Storage
 - name: create prometheus pvc

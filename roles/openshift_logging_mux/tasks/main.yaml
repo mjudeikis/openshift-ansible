@@ -95,7 +95,7 @@
     dest: "{{mktemp.stdout}}/secure-forward-mux.conf"
   changed_when: no
 
-- include_role:
+- import_role:
     name: openshift_logging
     tasks_from: patch_configmap_files.yaml
   vars:
@@ -148,7 +148,7 @@
         port: "{{ openshift_logging_mux_port }}"
         targetPort: "mux-forward"
     external_ips:
-      - "{{ ansible_eth0.ipv4.address }}"
+      - "{{ openshift_logging_mux_external_address }}"
   when: openshift_logging_mux_allow_external | bool
 
 - name: Set logging-mux service for internal communication

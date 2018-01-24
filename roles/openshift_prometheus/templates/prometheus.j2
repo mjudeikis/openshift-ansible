@@ -269,18 +269,18 @@ spec:
         configMap:
           defaultMode: 420
           name: alertmanager
-      - name: alertmanager-tls-secret
-        secret:
-          secretName: alertmanager-tls  
       - name: alertmanager-proxy-secret
         secret:
-          secretName: alertmanager-proxy 
-      - name: alerts-proxy-secret
+          secretName: alertmanager-proxy  
+      - name: alertmanager-tls-secret
         secret:
-          secretName: alerts-proxy
+          secretName: alertmanager-tls 
       - name: alerts-tls-secret
         secret:
           secretName: alerts-tls
+      - name: alerts-proxy-secret
+        secret:
+          secretName: alerts-proxy
       - name: alertmanager-data
 {% if openshift_prometheus_alertmanager_storage_type == 'pvc' %}
         persistentVolumeClaim:
