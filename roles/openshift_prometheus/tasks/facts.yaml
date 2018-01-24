@@ -7,7 +7,4 @@
 
 - set_fact:
     kubernetes_version: "{{ oc_version.results.kubernetes_short | float }}"
-    openshift_prometheus_service_annotations: "{{ l_openshift_prometheus_service_annotations + openshift_prometheus_service_annotations|list }}"
-    openshift_prometheus_alerts_service_annotations: "{{ l_openshift_prometheus_alerts_service_annotations + openshift_prometheus_alerts_service_annotations|list }}"
-    openshift_prometheus_alertmanager_service_annotations: "{{ l_openshift_prometheus_alertmanager_service_annotations + openshift_prometheus_alertmanager_service_annotations|list }} "
     openshift_prometheus_serviceaccount_annotations: "{{ l_openshift_prometheus_serviceaccount_annotations + openshift_prometheus_serviceaccount_annotations|list }}"
