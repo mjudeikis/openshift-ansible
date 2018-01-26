@@ -32,9 +32,12 @@
     #      serviceaccounts.openshift.io/oauth-redirectreference.prom: '{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"prometheus"}}'
     #      serviceaccounts.openshift.io/oauth-redirectreference.alerts: '{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"alerts"}}'
 
+<<<<<<< HEAD
     secrets:
       - prometheus-secrets
   changed_when: no
+=======
+>>>>>>> 2e97124... update after review.
 
 # TODO remove this when annotations are supported by oc_serviceaccount
 - name: annotate serviceaccount
@@ -54,6 +57,7 @@
     resource_name: cluster-reader
     user: "system:serviceaccount:{{ openshift_prometheus_namespace }}:prometheus"
 
+<<<<<<< HEAD
 # create prometheus and alerts services
 # TODO join into 1 task with loop
 - name: Create prometheus service
@@ -107,8 +111,61 @@
   command: >
     {{ openshift_client_binary }} annotate --overwrite -n {{ openshift_prometheus_namespace }}
     service alerts 'service.alpha.openshift.io/serving-cert-secret-name=prometheus-alerts-tls'
+=======
+
+- name: create services for prometheus
+  oc_service:
+    name: "{{ openshift_prometheus_service_name }}"
+    namespace: "{{ openshift_prometheus_namespace }}"
+    labels:
+      name: prometheus
+    annotations:
+      oprometheus.io/scrape: 'true'
+      oprometheus.io/scheme: https
+      service.alpha.openshift.io/serving-cert-secret-name: prometheus-tls
+    ports:
+      - name: prometheus
+        port: "{{ openshift_prometheus_service_port }}"
+        targetPort: "{{ openshift_prometheus_service_targetport }}"
+        protocol: TCP
+    selector:
+      app: prometheus
+
+- name: create services for alert buffer 
+  oc_service:
+    name: "{{ openshift_prometheus_alerts_service_name }}"
+    namespace: "{{ openshift_prometheus_namespace }}"
+    labels:
+      name: prometheus
+    annotations:
+      service.alpha.openshift.io/serving-cert-secret-name: alerts-tls
+    ports:
+      - name: prometheus
+        port: "{{ openshift_prometheus_service_port }}"
+        targetPort: "{{ openshift_prometheus_alerts_service_targetport }}"
+        protocol: TCP
+    selector:
+      app: prometheus
+
+- name: create services for alertmanager
+  oc_service:
+    name: "{{ openshift_prometheus_alertmanager_service_name }}"
+    namespace: "{{ openshift_prometheus_namespace }}"
+    labels:
+      name: prometheus
+    annotations:
+      service.alpha.openshift.io/serving-cert-secret-name: alertmanager-tls
+    ports:
+      - name: prometheus
+        port: "{{ openshift_prometheus_service_port }}"
+        targetPort: "{{ openshift_prometheus_alertmanager_service_targetport }}"
+        protocol: TCP
+    selector:
+      app: prometheus
+>>>>>>> 2e97124... update after review.
 
 # create prometheus and alerts routes
+# TODO: oc_route module should support insecureEdgeTerminationPolicy: Redirect
 - name: create prometheus and alerts routes
   oc_route:
     state: present
