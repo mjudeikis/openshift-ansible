@@ -74,6 +74,9 @@ This role has the following variables that control the integration of a
 GlusterFS cluster into a new or existing OpenShift cluster:
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e778e27a9... cherry-pick to 3.7 gluster block
 | Name                                                   | Default value           | Description                             |
 |--------------------------------------------------------|-------------------------|-----------------------------------------|
 | openshift_storage_glusterfs_timeout                    | 300                     | Seconds to wait for pods to become ready
@@ -119,6 +122,7 @@ GlusterFS cluster into a new or existing OpenShift cluster:
 | openshift_storage_glusterfs_heketi_ssh_user            | 'root'                  | SSH user for external GlusterFS nodes via native heketi
 | openshift_storage_glusterfs_heketi_ssh_sudo            | False                   | Whether to sudo (if non-root user) for SSH to external GlusterFS nodes via native heketi
 | openshift_storage_glusterfs_heketi_ssh_keyfile         | Undefined               | Path to a private key file for use with SSH connections to external GlusterFS nodes via native heketi **NOTE:** This must be an absolute path
+<<<<<<< HEAD
 =======
 | Name                                             | Default value           | Description                             |
 |--------------------------------------------------|-------------------------|-----------------------------------------|
@@ -164,6 +168,8 @@ GlusterFS cluster into a new or existing OpenShift cluster:
 | openshift_storage_glusterfs_heketi_ssh_sudo      | False                   | Whether to sudo (if non-root user) for SSH to external GlusterFS nodes via native heketi
 | openshift_storage_glusterfs_heketi_ssh_keyfile   | Undefined               | Path to a private key file for use with SSH connections to external GlusterFS nodes via native heketi **NOTE:** This must be an absolute path
 >>>>>>> ba6cd6b89... Port glusterfs optional default (#6182) to 3.7 stable
+=======
+>>>>>>> e778e27a9... cherry-pick to 3.7 gluster block
 | openshift_storage_glusterfs_heketi_fstab         | '/var/lib/heketi/fstab' | When heketi is native, sets the path to the fstab file on the GlusterFS nodes to update on LVM volume mounts, changes to '/etc/fstab/' when the heketi executor is 'ssh' **NOTE:** This should not need to be changed
 | openshift_storage_glusterfs_heketi_wipe          | False                   | Destroy any existing heketi resources, defaults to the value of `openshift_storage_glusterfs_wipe`
 
@@ -175,6 +181,9 @@ values in their corresponding non-registry variables. The following variables
 are an exception:
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e778e27a9... cherry-pick to 3.7 gluster block
 | Name                                                            | Default value         | Description                             |
 |-----------------------------------------------------------------|-----------------------|-----------------------------------------|
 | openshift_storage_glusterfs_registry_namespace                  | registry namespace    | Default is to use the hosted registry's namespace, otherwise 'glusterfs'
@@ -185,6 +194,7 @@ are an exception:
 | openshift_storage_glusterfs_registry_block_storageclass_default | False                 | Sets the StorageClass for each Gluster Block cluster as default
 | openshift_storage_glusterfs_registry_heketi_admin_key           | auto-generated        | Separate from the above
 | openshift_storage_glusterfs_registry_heketi_user_key            | auto-generated        | Separate from the above
+<<<<<<< HEAD
 =======
 | Name                                                      | Default value         | Description                             |
 |-----------------------------------------------------------|-----------------------|-----------------------------------------|
@@ -195,6 +205,8 @@ are an exception:
 | openshift_storage_glusterfs_registry_heketi_admin_key     | auto-generated        | Separate from the above
 | openshift_storage_glusterfs_registry_heketi_user_key      | auto-generated        | Separate from the above
 >>>>>>> ba6cd6b89... Port glusterfs optional default (#6182) to 3.7 stable
+=======
+>>>>>>> e778e27a9... cherry-pick to 3.7 gluster block
 
 Additionally, this role's behavior responds to several registry-specific variables in the [openshift_hosted role](../openshift_hosted/README.md):
 
