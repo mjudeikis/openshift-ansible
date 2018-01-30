@@ -36,3 +36,5 @@
 
 - name: reload systemd units
   command: systemctl daemon-reload
+  when:
+  - (not skip_node_svc_handlers | default(False) | bool)
