@@ -35,6 +35,20 @@ objects:
         - name: glusterfs
           image: ${IMAGE_NAME}:${IMAGE_VERSION}
           imagePullPolicy: IfNotPresent
+<<<<<<< HEAD
+=======
+          env:
+          - name: GB_GLFS_LRU_COUNT
+            value: "${GB_GLFS_LRU_COUNT}"
+          - name: TCMU_LOGDIR
+            value: "${TCMU_LOGDIR}"
+          - name: GB_LOGDIR
+            value: "/var/log/glusterfs/gluster-block"
+          resources:
+            requests:
+              memory: 100Mi
+              cpu: 100m
+>>>>>>> 8e1982cf3... Update glusterfs-template:
           volumeMounts:
           - name: glusterfs-heketi
             mountPath: "/var/lib/heketi"
@@ -73,7 +87,7 @@ objects:
               - systemctl status glusterd.service
             periodSeconds: 25
             successThreshold: 1
-            failureThreshold: 15
+            failureThreshold: 50
           livenessProbe:
             timeoutSeconds: 3
             initialDelaySeconds: 40
@@ -84,8 +98,12 @@ objects:
               - systemctl status glusterd.service
             periodSeconds: 25
             successThreshold: 1
+<<<<<<< HEAD
             failureThreshold: 15
           resources: {}
+=======
+            failureThreshold: 50
+>>>>>>> 8e1982cf3... Update glusterfs-template:
           terminationMessagePath: "/dev/termination-log"
         volumes:
         - name: glusterfs-heketi
