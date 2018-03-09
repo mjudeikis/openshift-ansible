@@ -35,8 +35,6 @@ objects:
         - name: glusterfs
           image: ${IMAGE_NAME}:${IMAGE_VERSION}
           imagePullPolicy: IfNotPresent
-<<<<<<< HEAD
-=======
           env:
           - name: GB_GLFS_LRU_COUNT
             value: "${GB_GLFS_LRU_COUNT}"
@@ -48,7 +46,6 @@ objects:
             requests:
               memory: 100Mi
               cpu: 100m
->>>>>>> 8e1982cf3... Update glusterfs-template:
           volumeMounts:
           - name: glusterfs-heketi
             mountPath: "/var/lib/heketi"
@@ -98,16 +95,7 @@ objects:
               - systemctl status glusterd.service
             periodSeconds: 25
             successThreshold: 1
-<<<<<<< HEAD
-<<<<<<< HEAD
-            failureThreshold: 15
-          resources: {}
-=======
             failureThreshold: 50
->>>>>>> 8e1982cf3... Update glusterfs-template:
-=======
-            failureThreshold: 50
->>>>>>> 8c18cb0fc... Merge pull request #7267 from SaravanaStorageNetwork/templates_fix
           terminationMessagePath: "/dev/termination-log"
         volumes:
         - name: glusterfs-heketi
