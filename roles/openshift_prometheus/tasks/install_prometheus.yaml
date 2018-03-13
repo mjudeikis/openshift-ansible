@@ -252,3 +252,52 @@
     files:
     - "{{ tempdir }}/templates/prometheus.yaml"
     delete_after: true
+
+- block:
+  - name: Set prometheus node-exporter template
+    template:
+      src: node_exporter.yml.j2
+      dest: "{{ tempdir }}/templates/node_exporter.yaml"
+    vars:
+      namespace: "{{ openshift_prometheus_namespace }}"
+
+  - name: create prometheus node-exporter serviceaccount
+    oc_serviceaccount:
+      state: present
+      name: "{{ openshift_prometheus_node_exporter_serviceaccount_name }}"
+      namespace: "{{ openshift_prometheus_namespace }}"
+    changed_when: no
+
+  - name: Add node-exporter service accounts to hostaccess SCC
+    oc_adm_policy_user:
+      user: "system:serviceaccount:{{ openshift_prometheus_namespace }}:{{ openshift_prometheus_node_exporter_serviceaccount_name }}"
+      resource_kind: scc
+      resource_name: hostaccess
+      state: present
+
+  - name: create services for prometheus node-exporter
+    oc_service:
+      name: "prometheus-node-exporter"
+      namespace: "{{ openshift_prometheus_namespace }}"
+      labels:
+        app: prometheus-node-exporter
+      annotations:
+        oprometheus.io/scrape: 'true'
+      ports:
+      - name: scrape
+        port: "{{ openshift_prometheus_node_exporter_service_port }}"
+        targetPort: "{{ openshift_prometheus_node_exporter_service_targetport }}"
+        protocol: TCP
+      selector:
+        app: prometheus-node-exporter
+
+  - name: Set prometheus node exporter
+    oc_obj:
+      state: present
+      name: "node-exporter"
+      namespace: "{{ openshift_prometheus_namespace }}"
+      kind: daemonset
+      files:
+      - "{{ tempdir }}/files/node_exporter.yaml"
+      delete_after: true
+  when: openshift_prometheus_node_exporter_deploy

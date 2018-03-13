@@ -1,13 +1,11 @@
 rule_files:
   - '*.rules'
-
 # A scrape configuration for running Prometheus on a Kubernetes cluster.
 # This uses separate scrape configs for cluster components (i.e. API server, node)
 # and services to allow each to use different authentication configs.
 #
 # Kubernetes labels will be added as Prometheus labels on metrics via the
 # `labelmap` relabeling action.
-
 # Scrape config for API servers.
 #
 # Kubernetes exposes API servers as endpoints to the default/kubernetes
@@ -17,15 +15,12 @@ rule_files:
 # well as HA API server deployments.
 scrape_configs:
 - job_name: 'kubernetes-apiservers'
-
   kubernetes_sd_configs:
   - role: endpoints
-
   scheme: https
   tls_config:
     ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-
   # Keep only the default/kubernetes service endpoints for the https port. This
   # will add targets for each API server which Kubernetes adds an endpoint to
   # the default/kubernetes service.
@@ -33,22 +28,20 @@ scrape_configs:
   - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
     action: keep
     regex: default;kubernetes;https
-
 # Scrape config for controllers.
 #
 # Each master node exposes a /metrics endpoint on :8444 that contains operational metrics for
 # the controllers.
 #
+# TODO: move this to a pure endpoints based metrics gatherer when controllers are exposed via
+#       endpoints.
 - job_name: 'kubernetes-controllers'
-
   scheme: https
   tls_config:
     ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-
   kubernetes_sd_configs:
   - role: endpoints
-
   # Keep only the default/kubernetes service endpoints for the https port, and then
   # set the port to 8444. This is the default configuration for the controllers on OpenShift
   # masters.
@@ -61,7 +54,6 @@ scrape_configs:
     target_label: __address__
     regex: (.+)(?::\d+)
     replacement: $1:8444
-
 # Scrape config for nodes.
 #
 # Each node exposes a /metrics endpoint that contains operational metrics for
@@ -82,27 +74,18 @@ scrape_configs:
   relabel_configs:
   - action: labelmap
     regex: __meta_kubernetes_node_label_(.+)
-
 # Scrape config for cAdvisor.
 #
 # Beginning in Kube 1.7, each node exposes a /metrics/cadvisor endpoint that
 # reports container metrics for each running pod. Scrape those by default.
 - job_name: 'kubernetes-cadvisor'
-
   scheme: https
   tls_config:
     ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-
-{% if kubernetes_version | float() >= 1.7 | float() %}
   metrics_path: /metrics/cadvisor
-{% else %}
-  metrics_path: /metrics
-{% endif %}
-
   kubernetes_sd_configs:
   - role: node
-
   # Exclude a set of high cardinality metrics that can contribute to significant
   # memory use in large clusters. These can be selectively enabled as necessary
   # for medium or small clusters.
@@ -110,11 +93,9 @@ scrape_configs:
   - source_labels: [__name__]
     action: drop
     regex: 'container_(cpu_user_seconds_total|cpu_cfs_periods_total|memory_usage_bytes|memory_swap|memory_working_set_bytes|memory_cache|last_seen|fs_(read_seconds_total|write_seconds_total|sector_(.*)|io_(.*)|reads_merged_total|writes_merged_total)|tasks_state|memory_failcnt|memory_failures_total|spec_memory_swap_limit_bytes|fs_(.*)_bytes_total|spec_(.*))'
-
   relabel_configs:
   - action: labelmap
     regex: __meta_kubernetes_node_label_(.+)
-
 # Scrape config for service endpoints.
 #
 # The relabeling allows the actual service scrape endpoint to be configured
@@ -127,59 +108,52 @@ scrape_configs:
 # * `prometheus.io/port`: If the metrics are exposed on a different port to the
 # service then set this appropriately.
 - job_name: 'kubernetes-service-endpoints'
-
   tls_config:
     ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
     # TODO: this should be per target
     insecure_skip_verify: true
-
   kubernetes_sd_configs:
   - role: endpoints
-
   relabel_configs:
-    # only scrape infrastructure components
-    - source_labels: [__meta_kubernetes_namespace]
-      action: keep
-      regex: 'default|logging|metrics|kube-.+|openshift|openshift-.+'
-    # drop infrastructure components managed by other scrape targets
-    - source_labels: [__meta_kubernetes_service_name]
-      action: drop
-      regex: 'prometheus-node-exporter'
-    # only those that have requested scraping
-    - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
-      action: keep
-      regex: true
-    - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
-      action: replace
-      target_label: __scheme__
-      regex: (https?)
-    - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
-      action: replace
-      target_label: __metrics_path__
-      regex: (.+)
-    - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
-      action: replace
-      target_label: __address__
-      regex: (.+)(?::\d+);(\d+)
-      replacement: $1:$2
-    - action: labelmap
-      regex: __meta_kubernetes_service_label_(.+)
-    - source_labels: [__meta_kubernetes_namespace]
-      action: replace
-      target_label: kubernetes_namespace
-    - source_labels: [__meta_kubernetes_service_name]
-      action: replace
-      target_label: kubernetes_name
-
+  # only scrape infrastructure components
+  - source_labels: [__meta_kubernetes_namespace]
+    action: keep
+    regex: 'default|logging|metrics|kube-.+|openshift|openshift-.+'
+  # drop infrastructure components managed by other scrape targets
+  - source_labels: [__meta_kubernetes_service_name]
+    action: drop
+    regex: 'prometheus-node-exporter'
+  # only those that have requested scraping
+  - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+    action: keep
+    regex: true
+  - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+    action: replace
+    target_label: __scheme__
+    regex: (https?)
+  - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+    action: replace
+    target_label: __metrics_path__
+    regex: (.+)
+  - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
+    action: replace
+    target_label: __address__
+    regex: (.+)(?::\d+);(\d+)
+    replacement: $1:$2
+  - action: labelmap
+    regex: __meta_kubernetes_service_label_(.+)
+  - source_labels: [__meta_kubernetes_namespace]
+    action: replace
+    target_label: kubernetes_namespace
+  - source_labels: [__meta_kubernetes_service_name]
+    action: replace
+    target_label: kubernetes_name
 # Scrape config for node-exporter, which is expected to be running on port 9100.
 - job_name: 'kubernetes-nodes-exporter'
-
   tls_config:
     ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-
   kubernetes_sd_configs:
   - role: node
-
   metric_relabel_configs:
   - source_labels: [__name__]
     action: drop
@@ -205,7 +179,6 @@ scrape_configs:
   - source_labels: [__name__, mountpoint]
     action: drop
     regex: 'node_filesystem_(free|size|device_error);([^/].*|/.+)'
-
   relabel_configs:
   - source_labels: [__address__]
     regex: '(.*):10250'
@@ -215,24 +188,48 @@ scrape_configs:
     target_label: __instance__
   - action: labelmap
     regex: __meta_kubernetes_node_label_(.+)
-
+# TODO: auto-generate these sections, or add a dynamic infrastructure scraper
 # Scrape config for the template service broker
 - job_name: 'openshift-template-service-broker'
   scheme: https
   tls_config:
     ca_file: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
     server_name: apiserver.openshift-template-service-broker.svc
-  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-
+  bearer_token_file: /var/run/secrets/kubernetes.io/scraper/token
   kubernetes_sd_configs:
   - role: endpoints
-
+    namespaces:
+      names:
+      - openshift-template-service-broker
   relabel_configs:
   - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
     action: keep
     regex: openshift-template-service-broker;apiserver;https
-
-
+# Scrape config for the router
+- job_name: 'openshift-router'
+  scheme: https
+  tls_config:
+    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+    server_name: router.default.svc
+  bearer_token_file: /var/run/secrets/kubernetes.io/scraper/token
+  kubernetes_sd_configs:
+  - role: endpoints
+    namespaces:
+      names:
+      - default
+  relabel_configs:
+  - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+    action: keep
+    regex: default;router;1936-tcp
+# Scrape config for the router
+- job_name: 'etcd'
+  scheme: https
+  tls_config:
+    insecure_skip_verify: True
+  static_configs:
+{% for host in groups['etcd'] %}
+  - {{ hostvars[host]['ansible_' + etcd_interface].ipv4.address }}:{{ etcd_client_port }}
+{% endfor %}
 alerting:
   alertmanagers:
   - scheme: http

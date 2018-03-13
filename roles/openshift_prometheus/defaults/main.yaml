@@ -26,6 +26,14 @@ l_openshift_prometheus_serviceaccount_annotations:
   - serviceaccounts.openshift.io/oauth-redirectreference.alerts='{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"alerts"}}'
   - serviceaccounts.openshift.io/oauth-redirectreference.alertmanager='{"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"alertmanager"}}'
 
+openshift_prometheus_node_exporter_deploy: false
+openshift_prometheus_node_exporter_service_name: prometheus-node-exporter
+openshift_prometheus_node_exporter_service_port: 9100
+openshift_prometheus_node_exporter_service_targetport: 9100
+openshift_prometheus_node_exporter_serviceaccount_name: prometheus-node-exporter
+openshift_prometheus_node_exporter_service_annotations:
+  - prometheus.io/scrape="true"
+
 # additional prometheus rules file
 openshift_prometheus_additional_rules_file: null
 
