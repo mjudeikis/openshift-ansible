@@ -1,5 +1,6 @@
 ---
 - set_fact:
+    grafana_state: "{{ openshift_grafana_state }}"
     grafana_namespace: "{{ openshift_grafana_namespace }}"
     grafana_timeout: "{{ openshift_grafana_pod_timeout }}"
     grafana_prometheus_namespace: "{{ openshift_grafana_prometheus_namespace }}"

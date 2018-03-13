@@ -12,8 +12,12 @@
   changed_when: False
   check_mode: no
 
-- include: facts.yml
-- include: setup.yml
+- include_tasks: facts.yaml
+- include_tasks: install_grafana.yaml
+  when: grafana_state == 'present'
+
+- include_tasks: uninstall_grafana.yaml
+  when: grafana_state == 'absent'
 
 - name: Delete temp directory
   file:

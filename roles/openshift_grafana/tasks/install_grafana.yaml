@@ -1,18 +1,18 @@
 ---
 
-#Todo: in 3.9 move to normal logic for checking if nodes exist (check prom logic)
 - name: Ensure that Grafana has nodes to run on
-  fail:
-    msg: |-
-      No schedulable nodes found matching node selector for Grafana - '{{ grafana_node_selector }}'
-  when:
-  - grafana_node_selector is not defined
+  import_role:
+    name: openshift_master
+    tasks_from: ensure_nodes_matching_selector.yml
+  vars:
+    openshift_master_ensure_nodes_selector: "{{ grafana_node_selector | map_to_pairs }}"
+    openshift_master_ensure_nodes_service: Grafana
 
 - name: Create grafana namespace
   oc_project:
     state: present
     name: "{{ grafana_namespace }}"
-    node_selector: "{{ grafana_node_selector | oo_selector_to_string_list() }}"
+    node_selector: "{{ grafana_node_selector | lib_utils_oo_selector_to_string_list() }}"
     description: Grafana
 
 - name: create grafana_serviceaccount_name serviceaccount
@@ -23,10 +23,9 @@
   changed_when: no
 
 # TODO remove this when annotations are supported by oc_serviceaccount
-# TODO change client_binary in 3.9
 - name: annotate serviceaccount
   command: >
-    {{ openshift.common.client_binary }} annotate --overwrite -n {{ grafana_namespace }}
+    {{ openshift_client_binary }} annotate --overwrite -n {{ grafana_namespace }}
     serviceaccount {{ grafana_serviceaccount_name }} {{ item }}
   with_items:
     "{{ grafana_serviceaccount_annotations }}"
@@ -77,7 +76,7 @@
     namespace: "{{ grafana_namespace }}"
     contents:
     - path: session_secret
-      data: "{{ 43 | oo_random_word }}="
+      data: "{{ 43 | lib_utils_oo_random_word }}="
   with_items:
   - grafana
 
@@ -135,13 +134,17 @@
   until:
   - "grafana_pod.results.results[0]['items'] | count > 0"
   # Pod's 'Ready' status must be True
-  - "grafana_pod.results.results[0]['items'] | oo_collect(attribute='status.conditions') | oo_collect(attribute='status', filters={'type': 'Ready'}) | map('bool') | select | list | count == 1"
+  - "grafana_pod.results.results[0]['items'] | lib_utils_oo_collect(attribute='status.conditions') | lib_utils_oo_collect(attribute='status', filters={'type': 'Ready'}) | map('bool') | select | list | count == 1"
   delay: 10
   retries: "{{ (grafana_timeout | int / 10) | int }}"
 
-- name: Get the prometheus SA
-  shell: "{{ openshift.common.client_binary }} sa get-token {{ grafana_prometheus_serviceaccount }} -n {{ grafana_prometheus_namespace }}"
+- name: Get the prometheus SA token
+  shell: oc sa get-token {{ grafana_prometheus_serviceaccount }} -n {{ grafana_prometheus_namespace }}
   register: prometheus_sa_token
+
+- name: Get the grafana SA token
+  shell: oc sa get-token {{ grafana_serviceaccount_name }} -n {{ grafana_namespace }}
+  register: grafana_sa_token
 
 - name: Get prometheus route
   oc_route:
@@ -150,7 +153,7 @@
     namespace: "{{ grafana_prometheus_namespace }}"
   register: prometheus_route
 
-- name: Get prometheus route
+- name: Get grafana route
   oc_route:
     state: list
     name: grafana
@@ -165,8 +168,8 @@
 - name: Add new datasource to grafana
   uri:
     url: "{{ grafana_route }}/api/datasources"
-    user: admin
-    password: admin
+    user: "{{ grafana_sa_token.stdout }}"
+    force_basic_auth: true
     method: POST
     body: '{{ payload_data }}'
     body_format: json
@@ -211,8 +214,8 @@
 - name: Add openshift dashboard
   uri:
     url: "{{ grafana_route }}/api/dashboards/db"
-    user: admin
-    password: admin
+    user: "{{ grafana_sa_token.stdout }}"
+    force_basic_auth: true
     method: POST
     body: '{{ slurpfile["content"] | b64decode }}'
     body_format: json
@@ -228,8 +231,8 @@
 - name: Add node exporter dashboard
   uri:
     url: "{{ grafana_route }}/api/dashboards/db"
-    user: admin
-    password: admin
+    user: "{{ grafana_sa_token.stdout }}"
+    force_basic_auth: true
     method: POST
     body: '{{ slurpfile["content"] | b64decode }}'
     body_format: json
