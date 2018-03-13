@@ -298,6 +298,6 @@
       namespace: "{{ openshift_prometheus_namespace }}"
       kind: daemonset
       files:
-      - "{{ tempdir }}/files/node_exporter.yaml"
+      - "{{ tempdir }}/templates/node_exporter.yaml"
       delete_after: true
   when: openshift_prometheus_node_exporter_deploy

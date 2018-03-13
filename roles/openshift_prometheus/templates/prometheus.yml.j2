@@ -227,9 +227,8 @@ scrape_configs:
   tls_config:
     insecure_skip_verify: True
   static_configs:
-{% for host in groups['etcd'] %}
-  - {{ hostvars[host]['ansible_' + etcd_interface].ipv4.address }}:{{ etcd_client_port }}
-{% endfor %}
+  - targets: [{% for host in groups['etcd'] %}"{{ host }}:2379"{% if not loop.last %}, {% endif %}{% endfor %}]
+
 alerting:
   alertmanagers:
   - scheme: http
