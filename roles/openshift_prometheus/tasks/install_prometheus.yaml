@@ -254,6 +254,12 @@
     delete_after: true
 
 - block:
+  - name: Add prometheus node exporter project
+    oc_project:
+      state: present
+      name: "{{ openshift_prometheus_node_exporter_namespace }}"
+      description: Prometheus Node exporter
+  
   - name: Set prometheus node-exporter template
     template:
       src: node_exporter.yml.j2
@@ -265,7 +271,7 @@
     oc_serviceaccount:
       state: present
       name: "{{ openshift_prometheus_node_exporter_serviceaccount_name }}"
-      namespace: "{{ openshift_prometheus_namespace }}"
+      namespace: "{{ openshift_prometheus_node_exporter_namespace }}"
     changed_when: no
 
   - name: Add node-exporter service accounts to hostaccess SCC
@@ -278,7 +284,7 @@
   - name: create services for prometheus node-exporter
     oc_service:
       name: "prometheus-node-exporter"
-      namespace: "{{ openshift_prometheus_namespace }}"
+      namespace: "{{ openshift_prometheus_node_exporter_namespace }}"
       labels:
         app: prometheus-node-exporter
       annotations:
@@ -295,7 +301,7 @@
     oc_obj:
       state: present
       name: "node-exporter"
-      namespace: "{{ openshift_prometheus_namespace }}"
+      namespace: "{{ openshift_prometheus_node_exporter_namespace }}"
       kind: daemonset
       files:
       - "{{ tempdir }}/templates/node_exporter.yaml"
