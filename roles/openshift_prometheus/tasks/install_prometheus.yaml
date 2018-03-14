@@ -14,6 +14,7 @@
   oc_project:
     state: present
     name: "{{ openshift_prometheus_namespace }}"
+    node_selector: "{{ openshift_prometheus_node_selector | oo_selector_to_string_list() }}"
     description: Prometheus
 
 # secrets
