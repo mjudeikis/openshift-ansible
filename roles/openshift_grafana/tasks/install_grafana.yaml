@@ -17,7 +17,7 @@
 # TODO remove this when annotations are supported by oc_serviceaccount
 - name: annotate serviceaccount
   command: >
-    {{ openshift_client_binary }} annotate --overwrite -n {{ grafana_namespace }}
+    {{ openshift.common.client_binary }} annotate --overwrite -n {{ grafana_namespace }}
     serviceaccount {{ grafana_serviceaccount_name }} {{ item }}
   with_items:
     "{{ grafana_serviceaccount_annotations }}"
@@ -68,7 +68,7 @@
     namespace: "{{ grafana_namespace }}"
     contents:
     - path: session_secret
-      data: "{{ 43 | lib_utils_oo_random_word }}="
+      data: "{{ 43 | oo_random_word }}="
   with_items:
   - grafana
 
@@ -126,7 +126,7 @@
   until:
   - "grafana_pod.results.results[0]['items'] | count > 0"
   # Pod's 'Ready' status must be True
-  - "grafana_pod.results.results[0]['items'] | lib_utils_oo_collect(attribute='status.conditions') | lib_utils_oo_collect(attribute='status', filters={'type': 'Ready'}) | map('bool') | select | list | count == 1"
+  - "grafana_pod.results.results[0]['items'] | oo_collect(attribute='status.conditions') | oo_collect(attribute='status', filters={'type': 'Ready'}) | map('bool') | select | list | count == 1"
   delay: 10
   retries: "{{ (grafana_timeout | int / 10) | int }}"
 
