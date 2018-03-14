@@ -258,6 +258,7 @@
     oc_project:
       state: present
       name: "{{ openshift_prometheus_node_exporter_namespace }}"
+      node_selector: "{{ openshift_prometheus_node_exporter_selector | oo_selector_to_string_list() }}"
       description: Prometheus Node exporter
   
   - name: Set prometheus node-exporter template
@@ -276,7 +277,7 @@
 
   - name: Add node-exporter service accounts to hostaccess SCC
     oc_adm_policy_user:
-      user: "system:serviceaccount:{{ openshift_prometheus_namespace }}:{{ openshift_prometheus_node_exporter_serviceaccount_name }}"
+      user: "system:serviceaccount:{{ openshift_prometheus_node_exporter_namespace }}:{{ openshift_prometheus_node_exporter_serviceaccount_name }}"
       resource_kind: scc
       resource_name: hostaccess
       state: present

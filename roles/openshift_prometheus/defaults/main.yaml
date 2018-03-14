@@ -34,6 +34,7 @@ openshift_prometheus_node_exporter_serviceaccount_name: prometheus-node-exporter
 openshift_prometheus_node_exporter_service_annotations:
   - prometheus.io/scrape="true"
 openshift_prometheus_node_exporter_namespace: openshift-metrics-node-exporter
+openshift_prometheus_node_exporter_selector: {"prometheus":"true"}
 
 # additional prometheus rules file
 openshift_prometheus_additional_rules_file: null

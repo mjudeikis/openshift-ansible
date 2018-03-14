@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
   name: prometheus-node-exporter
-  namespace: {{ namespace }}
+  namespace: {{ openshift_prometheus_node_exporter_namespace }}
   labels:
     app: prometheus-node-exporter
     role: monitoring
