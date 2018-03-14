@@ -4,7 +4,7 @@
   oc_project:
     state: present
     name: "{{ grafana_namespace }}"
-    node_selector: "{{ grafana_node_selector }}"
+    node_selector: "{{ grafana_node_selector | oo_selector_to_string_list() }}"
     description: Grafana
 
 - name: create grafana_serviceaccount_name serviceaccount
