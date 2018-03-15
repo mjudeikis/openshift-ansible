@@ -213,6 +213,7 @@
     method: POST
     body: '{{ slurpfile["content"] | b64decode }}'
     body_format: json
+    validate_certs: no
     headers:
       Content-Type: "Content-Type: application/json"
   register: add_ds
@@ -230,6 +231,7 @@
     method: POST
     body: '{{ slurpfile["content"] | b64decode }}'
     body_format: json
+    validate_certs: no
     headers:
       Content-Type: "Content-Type: application/json"
   register: add_ds
