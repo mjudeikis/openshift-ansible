@@ -166,6 +166,7 @@
     method: POST
     body: '{{ payload_data }}'
     body_format: json
+    validate_certs: no
     headers:
       Content-Type: "Content-Type: application/json"
   register: add_ds
