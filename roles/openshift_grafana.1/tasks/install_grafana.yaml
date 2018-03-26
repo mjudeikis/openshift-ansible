@@ -207,6 +207,9 @@
 - set_fact:
     cluster_monitoring_dashboard: "{{ mktemp.stdout }}/openshift-cluster-monitoring.json"
     node_exporter_dashboard: "{{ mktemp.stdout }}/node-exporter-full-dashboard.json"
+    s1_dashboard: "{{ mktemp.stdout }}/s1-etcd.json"
+    s3_dashboard: "{{ mktemp.stdout }}/s2-s3-Generic.json"
+    bc_deployments: "{{ mktemp.stdout }}/build-and-deployments.json"
 
 - name: Slurp dashboard file
   slurp:
@@ -244,3 +247,55 @@
       Content-Type: "Content-Type: application/json"
   register: add_ds
   when: grafana_node_exporter | default(false) | bool == true
+
+#summit labs dasboards
+- name: Slurp dashboard file
+  slurp:
+    src: "{{ s1_dashboard }}"
+  register: slurpfile
+
+- name: Add s1 dashboard
+  uri:
+    url: "{{ grafana_route }}/api/dashboards/db"
+    user: "{{ grafana_sa_token.stdout }}"
+    force_basic_auth: true
+    method: POST
+    body: '{{ slurpfile["content"] | b64decode }}'
+    body_format: json
+    validate_certs: no
+    headers:
+      Content-Type: "Content-Type: application/json"
+
+- name: Slurp dashboard file
+  slurp:
+    src: "{{ s3_dashboard }}"
+  register: slurpfile
+
+- name: Add s3 dashboard
+  uri:
+    url: "{{ grafana_route }}/api/dashboards/db"
+    user: "{{ grafana_sa_token.stdout }}"
+    force_basic_auth: true
+    method: POST
+    body: '{{ slurpfile["content"] | b64decode }}'
+    body_format: json
+    validate_certs: no
+    headers:
+      Content-Type: "Content-Type: application/json"
+
+- name: Slurp dashboard file
+  slurp:
+    src: "{{ bc_deployments }}"
+  register: slurpfile
+
+- name: Add bc dashboard
+  uri:
+    url: "{{ grafana_route }}/api/dashboards/db"
+    user: "{{ grafana_sa_token.stdout }}"
+    force_basic_auth: true
+    method: POST
+    body: '{{ slurpfile["content"] | b64decode }}'
+    body_format: json
+    validate_certs: no
+    headers:
+      Content-Type: "Content-Type: application/json"
