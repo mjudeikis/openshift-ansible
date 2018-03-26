@@ -14,7 +14,7 @@
   tasks:
   - name: setup grafana
     include_role:
-      name: openshift_grafana
+      name: openshift_grafana.1
     static: true
 
 - name: Grafana Install Checkpoint End
