@@ -211,11 +211,11 @@
     s3_dashboard: "{{ mktemp.stdout }}/s2-s3-Generic.json"
     bc_deployments: "{{ mktemp.stdout }}/build-and-deployments.json"
     cluster_resources: "{{ mktemp.stdout }}cluster-resources.json"
-    go_metrics: "{{ mktemp.stdout }}go-metrics.json"
-    haproxy: "{{ mktemp.stdout }}HAProxy.json"
-    infra_overview: i"{{ mktemp.stdout }}nfra-overview.json"
-    node_status: "{{ mktemp.stdout }}node-status.json"
-    pods_resources: "{{ mktemp.stdout }}pods-resources.json"
+    go_metrics: "{{ mktemp.stdout }}/go-metrics.json"
+    haproxy: "{{ mktemp.stdout }}/HAProxy.json"
+    infra_overview: "{{ mktemp.stdout }}/infra-overview.json"
+    node_status: "{{ mktemp.stdout }}/node-status.json"
+    pods_resources: "{{ mktemp.stdout }}/pods-resources.json"
 
 - name: Slurp dashboard file
   slurp:
