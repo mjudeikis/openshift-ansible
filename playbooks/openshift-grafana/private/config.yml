@@ -14,7 +14,7 @@
 - name: OpenShift Grafana
   hosts: oo_first_master
   roles:
-  - role: openshift_grafana
+  - role: openshift_grafana.1
 
 - name: Grafana Install Checkpoint End
   hosts: all
