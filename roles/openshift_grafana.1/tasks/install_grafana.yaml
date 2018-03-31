@@ -45,7 +45,7 @@
     resource_kind: scc
     resource_name: anyuid
     state: present
-   user: "system:serviceaccount:{{ grafana_namespace }}:{{ grafana_serviceaccount_name }}"
+    user: "system:serviceaccount:{{ grafana_namespace }}:{{ grafana_serviceaccount_name }}"
 
 - name: create grafana routes
   oc_route:
