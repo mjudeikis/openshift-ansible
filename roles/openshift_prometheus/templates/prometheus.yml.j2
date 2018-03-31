@@ -232,6 +232,14 @@ scrape_configs:
     action: keep
     regex: openshift-template-service-broker;apiserver;https
 
+# Scrape config for the router
+- job_name: 'etcd'
+  scheme: https
+  tls_config:
+    insecure_skip_verify: True
+  static_configs:
+  - targets: [{% for host in groups['etcd'] %}"{{ host }}:2379"{% if not loop.last %}, {% endif %}{% endfor %}]
+
 
 alerting:
   alertmanagers:

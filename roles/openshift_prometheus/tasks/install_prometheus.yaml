@@ -134,7 +134,8 @@
     host: "{{ item.host }}"
     namespace: "{{ openshift_prometheus_namespace }}"
     service_name: "{{ item.name }}"
-    tls_termination: reencrypt
+    #tls_termination: reencrypt
+    tls_termination: edge
   with_items:
   - name: prometheus
     host: "{{ openshift_prometheus_hostname }}"
@@ -253,3 +254,4 @@
     files:
     - "{{ tempdir }}/templates/prometheus.yaml"
     delete_after: true
+
