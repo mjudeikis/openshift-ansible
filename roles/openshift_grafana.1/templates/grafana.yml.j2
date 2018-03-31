@@ -48,7 +48,7 @@ spec:
         - name: grafana-http
           containerPort: {{ grafana_service_targetport }}
         volumeMounts:
-        - mountPath: "/var"
+        - mountPath: "/var/lib/grafana"
           name: grafana-data
         - mountPath: "/usr/share/grafana/conf"
           name: grafana-config
