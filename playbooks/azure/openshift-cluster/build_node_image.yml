@@ -33,6 +33,9 @@
   - name: add insights-client to package installs when on rhel
     set_fact:
       openshift_node_image_prep_packages: "{{ openshift_node_image_prep_packages | union(['insights-client']) }}"
+      openshift_pkg_version: "-3.10"
+      openshift_image_tag: "v3.10"
+      openshift_version: "3.10"
     when: openshift_deployment_type == 'openshift-enterprise'
 
   - set_fact:
