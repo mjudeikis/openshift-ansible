@@ -25,9 +25,9 @@
       openshift_node_include_control_plane: True
       openshift_control_plane_static_pod_location: /etc/origin/node/disabled/
       openshift_node_group_cloud_provider: azure
-      openshift_pkg_version: "-3.10"
-      openshift_image_tag: "v3.10"
-      openshift_version: "3.10"
+      openshift_pkg_version: "-{{ openshift_azure_openshift_release }}"
+      openshift_image_tag: "v{{ openshift_azure_openshift_release }}"
+      openshift_version: "{{ openshift_azure_openshift_release }}"
       openshift_node_image_prep_packages:
       - strace
       - tcpdump
