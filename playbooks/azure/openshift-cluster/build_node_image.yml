@@ -25,9 +25,6 @@
       openshift_node_include_control_plane: True
       openshift_control_plane_static_pod_location: /etc/origin/node/disabled/
       openshift_node_group_cloud_provider: azure
-      openshift_pkg_version: "-{{ openshift_azure_openshift_release }}"
-      openshift_image_tag: "v{{ openshift_azure_openshift_release }}"
-      openshift_version: "{{ openshift_azure_openshift_release }}"
       openshift_node_image_prep_packages:
       - strace
       - tcpdump
@@ -64,6 +61,9 @@
   import_playbook: ../../openshift-node/private/image_prep.yml
   vars:
     etcd_image: "{{ etcd_image_dict[openshift_deployment_type] }}"
+    openshift_pkg_version: "-{{ openshift_azure_openshift_release }}"
+    openshift_image_tag: "v{{ openshift_azure_openshift_release }}"
+    openshift_version: "{{ openshift_azure_openshift_release }}"
 
 - hosts: nodes
   tasks:
