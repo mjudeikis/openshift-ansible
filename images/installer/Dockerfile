@@ -30,6 +30,7 @@ LABEL name="openshift/origin-ansible" \
       io.openshift.tags="openshift,install,upgrade,ansible" \
       atomic.run="once"
 
+
 ENV USER_UID=1001 \
     HOME=/opt/app-root/src \
     WORK_DIR=/usr/share/ansible/openshift-ansible \
